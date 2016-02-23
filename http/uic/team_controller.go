@@ -5,6 +5,7 @@ import (
 	. "github.com/open-falcon/fe/model/uic"
 	"github.com/open-falcon/fe/utils"
 	"strings"
+	"github.com/astaxie/beego/orm"
 )
 
 type TeamController struct {
@@ -21,10 +22,16 @@ func (this *TeamController) Teams() {
 	per := this.MustGetInt("per", 10)
 	me := this.Ctx.Input.GetData("CurrentUser").(*User)
 
-	teams, err := QueryMineTeams(query, me.Id)
-	if err != nil {
-		this.ServeErrJson("occur error " + err.Error())
-		return
+	var teams orm.QuerySeter
+	if me.Role == 2 {
+			teams = QueryAllTeams(query)
+	}else{
+			teams2, err := QueryMineTeams(query, me.Id)
+			if err != nil {
+					this.ServeErrJson("occur error " + err.Error())
+					return
+			}
+			teams = teams2
 	}
 
 	total, err := teams.Count()

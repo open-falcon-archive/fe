@@ -48,6 +48,7 @@
 					</div>
 				</div>
 
+				{{if ne .CurrentUser.Passwd ""}}
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">Change Password</h3>
@@ -75,7 +76,7 @@
 						</a>
 					</div>
 				</div>
-
+				{{end}}
 			</div>
 		</div>
 	</div>

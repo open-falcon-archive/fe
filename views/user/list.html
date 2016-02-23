@@ -31,11 +31,12 @@ $(function() {
 						<span class="glyphicon glyphicon-search"></span>
 						Search
 					</button>
-
-                                        <a href="/me/user/c" class="btn btn-default pull-right">
-                                                <span class="glyphicon glyphicon-plus"></span>
-                                                Add
-                                        </a>
+					{{if gt $.Me.Role 0}}
+						<a href="/me/user/c" class="btn btn-default pull-right">
+						<span class="glyphicon glyphicon-plus"></span>
+							Add
+						</a>
+					{{end}}
 				</div>
 
 				<div class="us">
@@ -60,7 +61,7 @@ $(function() {
 						手机: {{.Phone}}<br>
 						IM：{{.IM}}， QQ：{{.QQ}}
 
-						{{if gt $.Me.Role 0}}
+						{{if gt $.Me.Role .Role}}
 						<div class="pull-right">
 							<a href="/target-user/edit?id={{.Id}}" class="orange" style="text-decoration:none;">
 								<span class="glyphicon glyphicon-edit"></span>

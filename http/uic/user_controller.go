@@ -195,6 +195,12 @@ func (this *UserController) CreateUserGet() {
 }
 
 func (this *UserController) CreateUserPost() {
+	me := this.Ctx.Input.GetData("CurrentUser").(*User)
+	if me.Role <= 0 {
+		this.ServeErrJson("no privilege")
+		return
+	}
+
 	name := strings.TrimSpace(this.GetString("name", ""))
 	password := strings.TrimSpace(this.GetString("password", ""))
 	cnname := strings.TrimSpace(this.GetString("cnname", ""))
@@ -266,12 +272,12 @@ func (this *UserController) CreateUserPost() {
 
 func (this *UserController) DeleteUser() {
 	me := this.Ctx.Input.GetData("CurrentUser").(*User)
-	if me.Role <= 0 {
+	userPtr := this.Ctx.Input.GetData("TargetUser").(*User)
+	if me.Role <= userPtr.Role {
 		this.ServeErrJson("no privilege")
 		return
 	}
 
-	userPtr := this.Ctx.Input.GetData("TargetUser").(*User)
 
 	_, err := userPtr.Remove()
 	if err != nil {
@@ -325,8 +331,9 @@ func (this *UserController) EditPost() {
 		return
 	}
 
+	me := this.Ctx.Input.GetData("CurrentUser").(*User)
 	targetUser := this.Ctx.Input.GetData("TargetUser").(*User)
-	if targetUser.Name == "root" {
+	if targetUser.Role >= me.Role {
 		this.ServeErrJson("no privilege")
 		return
 	}
@@ -353,8 +360,9 @@ func (this *UserController) ResetPassword() {
 		return
 	}
 
+	me := this.Ctx.Input.GetData("CurrentUser").(*User)
 	targetUser := this.Ctx.Input.GetData("TargetUser").(*User)
-	if targetUser.Name == "root" {
+	if targetUser.Role >= me.Role {
 		this.ServeErrJson("no privilege")
 		return
 	}
