@@ -3,21 +3,22 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/Cepave/fe/cache"
+	"github.com/Cepave/fe/g"
+	"github.com/Cepave/fe/graph"
+	"github.com/Cepave/fe/grpc"
+	"github.com/Cepave/fe/http"
+	"github.com/Cepave/fe/model"
+	"github.com/Cepave/fe/mq"
+	"github.com/toolkits/logger"
 	"log"
 	"os"
-
-	"github.com/open-falcon/fe/cache"
-	"github.com/open-falcon/fe/g"
-	"github.com/open-falcon/fe/http"
-	"github.com/open-falcon/fe/model"
-	"github.com/toolkits/logger"
 )
 
 func main() {
 	cfg := flag.String("c", "cfg.json", "configuration file")
 	version := flag.Bool("v", false, "show version")
 	flag.Parse()
-
 	if *version {
 		fmt.Println(g.VERSION)
 		os.Exit(0)
@@ -28,10 +29,22 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	conf := g.Config()
 	logger.SetLevelWithDefault(g.Config().Log, "info")
 
 	model.InitDatabase()
 	cache.InitCache()
 
-	http.Start()
+	if conf.Grpc.Enabled {
+		graph.Start()
+		go grpc.Start()
+	}
+	if conf.Mq.Enabled {
+		go mq.Start()
+	}
+	if conf.Http.Enabled {
+		go http.Start()
+	}
+
+	select {}
 }

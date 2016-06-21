@@ -1,19 +1,26 @@
 package model
 
 import (
+	"github.com/Cepave/fe/g"
+	"github.com/Cepave/fe/model/dashboard"
+	event "github.com/Cepave/fe/model/falcon_portal"
+	"github.com/Cepave/fe/model/uic"
 	"github.com/astaxie/beego/orm"
-	"github.com/open-falcon/fe/g"
-	. "github.com/open-falcon/fe/model/uic"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func InitDatabase() {
-	// set default database
-	config := g.Config()
-	orm.RegisterDataBase("default", "mysql", config.Uic.Addr, config.Uic.Idle, config.Uic.Max)
 
 	// register model
-	orm.RegisterModel(new(User), new(Team), new(Session), new(RelTeamUser))
+	orm.RegisterModel(new(uic.User), new(uic.Team), new(uic.Session),
+		new(uic.RelTeamUser), new(dashboard.Endpoint), new(dashboard.EndpointCounter),
+		new(dashboard.HostGroup), new(dashboard.Hosts), new(event.EventCases),
+		new(event.Events), new(event.Tpl), new(event.EventNote))
+	// databases_name, sql_derver, db_addr, idle_time, mix_connection
+	config := g.Config()
+	orm.RegisterDataBase("default", "mysql", config.Uic.Addr, config.Uic.Idle, config.Uic.Max)
+	orm.RegisterDataBase("graph", "mysql", config.GraphDB.Addr, config.GraphDB.Idle, config.GraphDB.Max)
+	orm.RegisterDataBase("falcon_portal", "mysql", config.FalconPortal.Addr, config.FalconPortal.Idle, config.FalconPortal.Max)
 
 	if config.Log == "debug" {
 		orm.Debug = true
